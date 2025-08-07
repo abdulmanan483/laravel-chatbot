@@ -53,6 +53,7 @@
                     addMessage(response.question, 'bot');
                 } else if (response.status === 'complete') {
                     getSummary();
+
                 } else {}
             });
         }
@@ -98,6 +99,7 @@
                     //     restartSession();
                     // }
                 }
+                $('#chat-form').hide();
             });
         }
 
@@ -110,6 +112,7 @@
                     sessionId = response.session_id;
                     localStorage.setItem('chatbot_session_id', sessionId);
                     getNextQuestion();
+                    $('#chat-form').show();
                 }
             });
         }
@@ -117,7 +120,7 @@
             $.get('/api/v1/chatbot/session-detail', {
                 session_id: sessionId
             }, function(response) {
-                if (response.status === 'success') {
+                if (response.status === 'success' && response.data && response.data.messages) {
                     $('#chat-body').empty(); // Clear old messages
 
                     response.data.messages.forEach(msg => {
@@ -129,17 +132,18 @@
                             <span class="text-xs text-gray-400">${msg.created_at}</span>
                         </div>
                     `;
-                    if(msg.question)
-                        addMessage(msg.question.title, 'bot');
-                    addMessage(msg.message, msg.role);
-                    // $('#chat-body').append(messageHtml);
-                });
-                console.log(messageHtml);
+                        if (msg.question)
+                            addMessage(msg.question.title, 'bot');
+                        addMessage(msg.message, msg.role);
+                        // $('#chat-body').append(messageHtml);
+                    });
 
                     // Scroll to bottom
                     $('#chat-body').scrollTop($('#chat-body')[0].scrollHeight);
                 } else {
-                    alert('Failed to load messages');
+                    localStorage.removeItem('chatbot_session_id'); // Clear session ID if no messages
+                    sessionId = null; // Reset session ID
+                    startSession();
                 }
             }).fail(() => {
                 alert('Error fetching messages.');
