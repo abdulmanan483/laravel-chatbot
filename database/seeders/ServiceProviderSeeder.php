@@ -40,10 +40,10 @@ class ServiceProviderSeeder extends Seeder
         $bedRepair    = Service::firstOrCreate(['name' => 'Furniture Repair', 'city_id' => $ktm->id, 'country_id' => $nepal->id]);
 
         // Attach fixed users to fixed services (replace with real user IDs or random if needed)
-        // ServiceProvider::create([
-        //     'user_id'    => $users[array_rand($users)],
-        //     'service_id' => $acRepair->id,
-        // ]);
+        ServiceProvider::create([
+            'user_id'    => $users[array_rand($users)],
+            'service_id' => $acRepair->id,
+        ]);
 
         ServiceProvider::create([
             'user_id'    => $users[array_rand($users)],
