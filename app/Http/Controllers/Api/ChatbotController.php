@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
-use App\Models\ChatMessages;
 use Illuminate\Http\Request;
 use App\Models\ChatSession;
 use App\Models\Question;
@@ -77,85 +76,6 @@ class ChatbotController extends Controller
             'message' => 'Answer saved.'
         ]);
     }
-    // public function getSessionSummary(Request $request, OpenAIService $openAI)
-    // {
-    //     $session = ChatSession::where('uuid', $request->session_id)->firstOrFail();
-    //     $answers = $session->messages()->with('question')->get();
-    //     if ($answers->isEmpty()) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'No answers found in this session.'
-    //         ]);
-    //     }
-
-    //     // Build a summary prompt
-    //     $prompt = "Here is the user information:\n";
-
-    //     foreach ($answers as $answer) {
-    //         $prompt .= "{$answer->question->title}: {$answer->message}\n";
-    //     }
-
-    //     // $prompt .= "\nNow suggest the most suitable service(s) from the database based on this information.";
-    //     $reply = $openAI->ask($prompt);
-
-    //     // Return the response
-    //     if (empty($reply)) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'No suitable service found.'
-    //         ]);
-    //     }
-
-    //     $city = City::where('name', $reply['city'])->first();
-    //     $country = Country::where('iso3', $reply['country_code'])->first();
-    //     $services = $reply['service'];
-    //     // dd($services, $city, $country, $reply);
-    //     $service_prodivders = ServiceProvider::with([
-    //         'user',
-    //         'service' => fn($q) =>
-    //         $q->where(
-    //             fn($q) =>
-    //             collect($services)->each(
-    //                 fn($s) =>
-    //                 $q->orWhere('name', 'like', "%$s%")
-    //             )
-    //         )
-    //             ->where('city_id', $city->id)
-    //             ->where('country_id', $country->id),
-    //         'service.city',
-    //         'service.country'
-    //     ])->whereHas(
-    //         'service',
-    //         fn($q) =>
-    //         $q->where(
-    //             fn($q) =>
-    //             collect($services)->each(
-    //                 fn($s) =>
-    //                 $q->orWhere('name', 'like', "%$s%")
-    //             )
-    //         )
-    //             ->where('city_id', $city->id)
-    //             ->where('country_id', $country->id)
-    //     )->get();
-    //     $formattedProviders = $service_prodivders->map(function ($provider) {
-    //         return [
-    //             'provider_id' => $provider->id,
-    //             'user_name' => $provider->user->name ?? null,
-    //             'service' => $provider->service->name ?? null,
-    //             'city' => $provider->service->city->name ?? null,
-    //             'country' => $provider->service->country->name ?? null,
-    //         ];
-    //     });
-
-    //     // Save the session end time
-    //     // $session->ended_at = now();
-    //     // $session->save();
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'gpt_response' => $reply,
-    //         'service_prodivders' => $formattedProviders,
-    //     ]);
-    // }
     public function getSessionSummary(Request $request, OpenAIService $openAI)
     {
         $session = $this->getSessionByUuid($request->session_id);
@@ -171,9 +91,6 @@ class ChatbotController extends Controller
         if (empty($reply)) {
             return $this->errorResponse('No suitable service found.');
         }
-
-        // $city = City::where('name', $reply['city'])->first();
-        // $country = Country::where('iso3', $reply['country_code'])->first();
         $city = City::whereRaw('LOWER(name) = ?', [strtolower($reply['city'])])
             ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($reply['city']) . '%'])
             ->first();
@@ -295,9 +212,6 @@ class ChatbotController extends Controller
 
         return $intro . $list;
     }
-
-
-
     public function restartSession(Request $request)
     {
         $session = ChatSession::where('uuid', $request->session_id)->firstOrFail();
