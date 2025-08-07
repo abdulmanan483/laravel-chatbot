@@ -15,8 +15,8 @@ class QuestionsTableSeeder extends Seeder
     {
         $questions = [
             'What is your full name?',
-            'What is your email address?',
-            'What is your phone number?',
+            // 'What is your email address?',
+            // 'What is your phone number?',
             'Which country are you from?',
             'Which city are you from?',
             'What type of service are you looking for?',
