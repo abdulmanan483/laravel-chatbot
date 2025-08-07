@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS "chat_messages"(
   "role" varchar check("role" in('user', 'assistant')) not null,
   "created_at" datetime,
   "updated_at" datetime,
-  foreign key("session_id") references "sessions"("id") on delete cascade,
+   foreign key("session_id") references "chat_sessions"("id") on delete cascade
   foreign key("question_id") references "questions"("id") on delete set null
 );
 CREATE TABLE IF NOT EXISTS "personal_access_tokens"(
