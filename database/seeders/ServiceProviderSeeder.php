@@ -18,7 +18,7 @@ class ServiceProviderSeeder extends Seeder
         $services = Service::pluck('id')->all();
 
         // Create 50 random service providers
-        foreach (range(1, 50) as $i) {
+        foreach (range(1, 200) as $i) {
             ServiceProvider::create([
                 'user_id' => fake()->randomElement($users),
                 'service_id' => fake()->randomElement($services),
